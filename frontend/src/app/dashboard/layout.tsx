@@ -12,7 +12,7 @@ const SIDEBAR_COLLAPSED_KEY = "flow_reports_sidebar_collapsed";
 
 const SIDEBAR_LINKS: { href: string; label: string; icon: React.ReactNode; permission?: string }[] = [
   { href: "/dashboard", label: "Dashboard", icon: <IconHome /> },
-  { href: "/dashboard/questions", label: "Questions", icon: <IconDocument />, permission: "reports.view" },
+  { href: "/dashboard/questions", label: "Questions", icon: <IconDocument /> },
   { href: "/dashboard/users", label: "Users", icon: <IconUsers />, permission: "users.view" },
 ];
 
