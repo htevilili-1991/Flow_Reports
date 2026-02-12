@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AuthGuard } from "@/components/AuthGuard";
 import { useAuth } from "@/contexts/AuthContext";
-import { IconHome, IconUsers, IconDocument, IconChevronLeft, IconChevronRight } from "@/components/icons";
+import { IconHome, IconUsers, IconDocument, IconDatabase, IconChevronLeft, IconChevronRight } from "@/components/icons";
 import { Badge } from "@/components/ui";
 
 const SIDEBAR_COLLAPSED_KEY = "flow_reports_sidebar_collapsed";
@@ -13,6 +13,7 @@ const SIDEBAR_COLLAPSED_KEY = "flow_reports_sidebar_collapsed";
 const SIDEBAR_LINKS: { href: string; label: string; icon: React.ReactNode; permission?: string }[] = [
   { href: "/dashboard", label: "Dashboard", icon: <IconHome /> },
   { href: "/dashboard/questions", label: "Questions", icon: <IconDocument /> },
+  { href: "/dashboard/data-sources", label: "Data sources", icon: <IconDatabase /> },
   { href: "/dashboard/users", label: "Users", icon: <IconUsers />, permission: "users.view" },
 ];
 

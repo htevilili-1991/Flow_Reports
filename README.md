@@ -72,11 +72,12 @@ Flow_Reports/
 │   ├── flow_reports_project/   # Django project (settings, urls)
 │   ├── users/                 # Auth, RBAC (Role, UserProfile, JWT, /me, /roles, /users)
 │   ├── questions/             # Saved questions, NL→SQL, run read-only query
+│   ├── data_sources/          # Data source connections (PostgreSQL, MySQL, SQLite), test API
 │   ├── manage.py
 │   └── requirements.txt
 ├── frontend/
 │   └── src/
-│       ├── app/               # Routes: login, register, dashboard, dashboard/questions, dashboard/users
+│       ├── app/               # Routes: login, register, dashboard, questions, data-sources, users
 │       ├── components/       # AuthGuard, etc.
 │       ├── contexts/         # AuthContext (login, permissions)
 │       ├── lib/              # api.ts (apiUrl, authFetch)
@@ -97,6 +98,7 @@ Flow_Reports/
 - **NL→SQL** — natural language to read-only SQL (placeholder rules; extend or plug in LLM)
 - **Run query API** — execute SELECT-only SQL, return rows as JSON
 - **Questions UI** — list, create, edit, run; results table and chart placeholder
+- **Data sources** — add PostgreSQL, MySQL, or SQLite connections; test connection before save; list and edit
 
 ## API overview
 
@@ -117,6 +119,12 @@ Flow_Reports/
 | DELETE | `/api/questions/<id>/` | JWT | Delete saved question |
 | POST   | `/api/questions/generate-sql/` | JWT | NL→SQL (body: natural_language, optional question_id) |
 | POST   | `/api/questions/run/` | JWT | Run query (body: question_id or sql) |
+| GET    | `/api/data-sources/` | JWT | List data sources |
+| POST   | `/api/data-sources/` | JWT | Create data source |
+| GET    | `/api/data-sources/<id>/` | JWT | Get data source |
+| PATCH  | `/api/data-sources/<id>/` | JWT | Update data source |
+| DELETE | `/api/data-sources/<id>/` | JWT | Delete data source |
+| POST   | `/api/data-sources/test/` | JWT | Test connection (body: db_type, config or data_source_id) |
 
 ## Scripts
 
