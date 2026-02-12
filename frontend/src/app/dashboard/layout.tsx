@@ -15,19 +15,6 @@ const SIDEBAR_LINKS: { href: string; label: string; icon: React.ReactNode; permi
   { href: "/dashboard/users", label: "Users", icon: <IconUsers />, permission: "users.view" },
 ];
 
-function getBreadcrumbs(pathname: string): { label: string; href?: string }[] {
-  const segments = pathname.replace(/^\/dashboard\/?/, "").split("/").filter(Boolean);
-  const crumbs = [{ label: "Dashboard", href: "/dashboard" }];
-  let path = "/dashboard";
-  for (const seg of segments) {
-    path += `/${seg}`;
-    const label = seg.charAt(0).toUpperCase() + seg.slice(1);
-    crumbs.push({ label, href: path });
-  }
-  if (crumbs.length > 1) crumbs[crumbs.length - 1] = { label: crumbs[crumbs.length - 1].label };
-  return crumbs;
-}
-
 export default function DashboardLayout({
   children,
 }: {
@@ -43,7 +30,6 @@ export default function DashboardLayout({
 function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout, hasPermission } = useAuth();
-  const breadcrumbs = getBreadcrumbs(pathname ?? "/dashboard");
 
   const [collapsed, setCollapsed] = useState(false);
   useEffect(() => {
@@ -82,7 +68,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
             {!collapsed && <span>Flow Reports</span>}
           </Link>
         </div>
-        <nav className="flex-1 space-y-0.5 overflow-y-auto p-2">
+        <div className="flex-1 space-y-0.5 overflow-y-auto p-2">
           {nav.map(({ href, label, icon }) => (
             <Link
               key={href}
@@ -100,35 +86,19 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
               {!collapsed && label}
             </Link>
           ))}
-        </nav>
-        <div className="border-t border-zinc-200 p-2">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="flex w-full items-center justify-center rounded-lg py-2.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
-          >
-            {collapsed ? <IconChevronRight /> : <IconChevronLeft />}
-          </button>
         </div>
       </aside>
       <main className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-zinc-200 bg-white px-6">
-          <nav className="flex items-center gap-1 text-sm text-zinc-500">
-            {breadcrumbs.map((item, i) => (
-              <span key={i} className="flex items-center gap-1">
-                {i > 0 && <span className="text-zinc-300">/</span>}
-                {item.href ? (
-                  <Link href={item.href} className="hover:text-zinc-700 hover:underline">
-                    {item.label}
-                  </Link>
-                ) : (
-                  <span className="text-zinc-700">{item.label}</span>
-                )}
-              </span>
-            ))}
-          </nav>
-          <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="flex items-center justify-center rounded-lg p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
+          >
+            {collapsed ? <IconChevronRight /> : <IconChevronLeft />}
+          </button>
+          <div className="ml-auto flex items-center gap-3">
             <span className="text-sm text-zinc-600">
               {user?.username}
               {user?.role && (
