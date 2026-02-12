@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  # Added for token authentication
     'users',
     'questions',
+    'data_sources',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
