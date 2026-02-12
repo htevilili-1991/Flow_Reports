@@ -44,8 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'rest_framework.authtoken', # Added for token authentication
+    'rest_framework.authtoken',  # Added for token authentication
     'users',
+    'questions',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
