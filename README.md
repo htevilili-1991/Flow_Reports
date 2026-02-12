@@ -71,11 +71,12 @@ Flow_Reports/
 ├── backend/
 │   ├── flow_reports_project/   # Django project (settings, urls)
 │   ├── users/                 # Auth, RBAC (Role, UserProfile, JWT, /me, /roles, /users)
+│   ├── questions/             # Saved questions, NL→SQL, run read-only query
 │   ├── manage.py
 │   └── requirements.txt
 ├── frontend/
 │   └── src/
-│       ├── app/               # Routes: login, register, dashboard, dashboard/users
+│       ├── app/               # Routes: login, register, dashboard, dashboard/questions, dashboard/users
 │       ├── components/       # AuthGuard, etc.
 │       ├── contexts/         # AuthContext (login, permissions)
 │       ├── lib/              # api.ts (apiUrl, authFetch)
@@ -83,12 +84,19 @@ Flow_Reports/
 └── README.md
 ```
 
-## Features (Phase 1)
+## Features
 
+### Phase 1
 - **JWT authentication** — access + refresh tokens; login/register and protected routes
 - **Role-based access control** — roles: Administrator, Editor, Viewer with permission codes
 - **RBAC API** — `GET /api/users/me/`, `GET /api/users/roles/`, `GET /api/users/users/` (admin), `PATCH /api/users/users/<id>/role/` (admin)
-- **Dashboard** — sidebar layout, role-based nav (e.g. **Users** for admins), user management page to assign roles
+- **Dashboard** — sidebar layout, role-based nav (Users, Questions), user management page
+
+### Phase 2 – Data & queries
+- **Saved questions** — store title, natural language question, and generated SQL per user
+- **NL→SQL** — natural language to read-only SQL (placeholder rules; extend or plug in LLM)
+- **Run query API** — execute SELECT-only SQL, return rows as JSON
+- **Questions UI** — list, create, edit, run; results table and chart placeholder
 
 ## API overview
 
@@ -102,6 +110,13 @@ Flow_Reports/
 | PATCH  | `/api/users/users/<id>/role/` | Admin | Set user role |
 | POST   | `/api/users/register/` | — | Register (username, email, password) |
 | POST   | `/api/users/login/` | — | Legacy token login |
+| GET    | `/api/questions/` | JWT | List saved questions |
+| POST   | `/api/questions/` | JWT | Create saved question |
+| GET    | `/api/questions/<id>/` | JWT | Get saved question |
+| PATCH  | `/api/questions/<id>/` | JWT | Update saved question |
+| DELETE | `/api/questions/<id>/` | JWT | Delete saved question |
+| POST   | `/api/questions/generate-sql/` | JWT | NL→SQL (body: natural_language, optional question_id) |
+| POST   | `/api/questions/run/` | JWT | Run query (body: question_id or sql) |
 
 ## Scripts
 
