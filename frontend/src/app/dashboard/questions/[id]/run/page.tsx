@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/api";
 import {
   PageHeader,
@@ -28,7 +27,6 @@ export default function RunQuestionPage() {
   const params = useParams();
   const router = useRouter();
   const id = Number(params.id);
-  const { hasPermission } = useAuth();
   const [question, setQuestion] = useState<SavedQuestion | null>(null);
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,22 +61,6 @@ export default function RunQuestionPage() {
       return;
     }
     setRows(data.rows || []);
-  }
-
-  if (!hasPermission("reports.view")) {
-    return (
-      <div>
-        <PageHeader
-          title="Run question"
-          breadcrumbs={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Questions", href: "/dashboard/questions" },
-            { label: "Run" },
-          ]}
-        />
-        <Alert variant="error">You don’t have permission to run questions.</Alert>
-      </div>
-    );
   }
 
   if (loading || !question) {

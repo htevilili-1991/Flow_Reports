@@ -28,18 +28,6 @@ export default function QuestionsPage() {
 
   const canEdit = hasPermission("reports.edit");
 
-  if (!hasPermission("reports.view")) {
-    return (
-      <div>
-        <PageHeader
-          title="Saved questions"
-          breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Questions" }]}
-        />
-        <p className="text-zinc-600">You don’t have permission to view questions.</p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <PageHeader
