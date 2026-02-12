@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/api";
+import { PageHeader, Alert, DataTable, Badge } from "@/components/ui";
 
 interface Role {
   id: number;
@@ -67,83 +68,69 @@ export default function DashboardUsersPage() {
   if (!hasPermission("users.view") && !hasPermission("users.edit")) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Users</h1>
-        <p className="mt-2 text-zinc-600">You don’t have permission to view this page.</p>
+        <PageHeader
+          title="Users"
+          breadcrumbs={[{ label: "Dashboard", href: "/dashboard" }, { label: "Users" }]}
+        />
+        <Alert variant="error" title="Access denied">
+          You don’t have permission to view this page.
+        </Alert>
       </div>
     );
   }
 
-  if (loading) {
-    return (
-      <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Users</h1>
-        <p className="mt-2 text-zinc-500">Loading…</p>
-      </div>
-    );
-  }
+  const columns = [
+    { key: "username", header: "Username" },
+    { key: "email", header: "Email" },
+    {
+      key: "role",
+      header: "Role",
+      render: (row: UserRow) =>
+        canManage ? (
+          <select
+            value={row.role?.id ?? ""}
+            disabled={updatingId === row.id}
+            onChange={(e) => {
+              const id = Number(e.target.value);
+              if (id) updateRole(row.id, id);
+            }}
+            className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">No role</option>
+            {roles.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          row.role ? <Badge variant="default">{row.role.name}</Badge> : "—"
+        ),
+    },
+  ];
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-zinc-900">User management</h1>
-      <p className="mt-1 text-zinc-600">Assign roles to users. Administrator-only.</p>
+      <PageHeader
+        title="User management"
+        description="Assign roles to users. Administrator-only."
+        breadcrumbs={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Users" },
+        ]}
+      />
       {error && (
-        <div className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <Alert variant="error" className="mb-6">
           {error}
-        </div>
+        </Alert>
       )}
-      <div className="mt-6 overflow-hidden rounded-lg border border-zinc-200 bg-white">
-        <table className="min-w-full divide-y divide-zinc-200">
-          <thead className="bg-zinc-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-500">
-                Username
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-500">
-                Email
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-500">
-                Role
-              </th>
-              {canManage && (
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-zinc-500">
-                  Actions
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-200">
-            {users.map((user) => (
-              <tr key={user.id} className="bg-white">
-                <td className="px-4 py-3 text-sm text-zinc-900">{user.username}</td>
-                <td className="px-4 py-3 text-sm text-zinc-600">{user.email}</td>
-                <td className="px-4 py-3 text-sm text-zinc-600">
-                  {user.role?.name ?? "—"}
-                </td>
-                {canManage && (
-                  <td className="px-4 py-3">
-                    <select
-                      value={user.role?.id ?? ""}
-                      disabled={updatingId === user.id}
-                      onChange={(e) => {
-                        const id = Number(e.target.value);
-                        if (id) updateRole(user.id, id);
-                      }}
-                      className="rounded border border-zinc-300 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    >
-                      <option value="">No role</option>
-                      {roles.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.name}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable<UserRow>
+        columns={columns}
+        data={users}
+        keyExtractor={(row) => row.id}
+        emptyMessage="No users yet."
+        loading={loading}
+      />
     </div>
   );
 }
