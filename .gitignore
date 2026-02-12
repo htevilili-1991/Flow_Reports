@@ -10,6 +10,7 @@ venv/
 .eggs/
 
 # Django
+.env
 *.log
 local_settings.py
 db.sqlite3

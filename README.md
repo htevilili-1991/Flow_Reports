@@ -24,10 +24,27 @@ source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Create the PostgreSQL database and user (if not already done), then:
+Create the PostgreSQL database and user, then run migrations:
 
 ```bash
-# Configure DB in backend/flow_reports_project/settings.py if needed (NAME, USER, PASSWORD, HOST)
+# Create DB and user (run as postgres superuser; password in backend/.env)
+sudo -u postgres psql -f backend/scripts/create_db.sql
+
+# Or from backend/scripts: sudo -u postgres psql -f create_db.sql
+```
+
+Copy and edit env (optional; defaults match create_db.sql):
+
+```bash
+cd backend
+cp .env.example .env
+# Edit .env if you used different DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+```
+
+Then:
+
+```bash
+pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
 ```
@@ -56,7 +73,7 @@ App: **http://localhost:3000**
 | Where        | Variable              | Example                |
 |-------------|------------------------|------------------------|
 | **Frontend** | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` |
-| **Backend**  | DB in `settings.py`   | `NAME`, `USER`, `PASSWORD`, `HOST` |
+| **Backend**  | `backend/.env`       | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` (see `.env.example`) |
 
 Frontend `.env.local` (create if missing):
 
