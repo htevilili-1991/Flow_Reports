@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Flow Reports",
-  description: "Processing and Reconciliation Management Information System",
+  description: "Flow Report",
 };
 
 export default function RootLayout({
