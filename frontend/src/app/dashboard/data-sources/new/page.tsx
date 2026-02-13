@@ -84,10 +84,17 @@ export default function NewDataSourcePage() {
       method: "POST",
       body: JSON.stringify({ name: name.trim(), db_type: dbType, config: getConfig() }),
     });
+    const data = await res.json().catch(() => ({}));
     setSaving(false);
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(data.name?.[0] || data.config?.[0] || "Failed to save.");
+      const msg =
+        data.detail ||
+        (typeof data.name !== "undefined" && Array.isArray(data.name) ? data.name[0] : null) ||
+        (typeof data.config !== "undefined" && Array.isArray(data.config) ? data.config[0] : null) ||
+        (typeof data.db_type !== "undefined" && Array.isArray(data.db_type) ? data.db_type[0] : null) ||
+        (typeof data === "object" && data !== null ? JSON.stringify(data) : null) ||
+        `Failed to save (${res.status}).`;
+      setError(msg);
       return;
     }
     router.push("/dashboard/data-sources");

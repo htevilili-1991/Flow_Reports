@@ -73,7 +73,7 @@ App: **http://localhost:3000**
 | Where        | Variable              | Example                |
 |-------------|------------------------|------------------------|
 | **Frontend** | `NEXT_PUBLIC_API_URL` | `http://localhost:8000` |
-| **Backend**  | `backend/.env`       | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` (see `.env.example`) |
+| **Backend**  | `backend/.env`       | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`; optional `REDIS_URL`, `QUERY_CACHE_TIMEOUT` (see `.env.example`) |
 
 Frontend `.env.local` (create if missing):
 
@@ -117,6 +117,11 @@ Flow_Reports/
 - **Questions UI** — list, create, edit, run; results table and chart placeholder
 - **Data sources** — add PostgreSQL, MySQL, or SQLite connections; test connection before save; list and edit
 
+### Cache & refresh (Power BI–style)
+- **Query result cache** — run-query results are cached (in-memory by default; Redis if `REDIS_URL` is set). TTL: `QUERY_CACHE_TIMEOUT` (default 300s).
+- **Refresh data** — dashboard "Refresh data" button calls `POST /api/data-sources/<id>/refresh-cache/` to invalidate cache for that source, then widgets refetch from the DB.
+- **Optional** — use PostgreSQL materialized views for pre-aggregated data and refresh them on a schedule.
+
 ## API overview
 
 | Method | Endpoint | Auth | Description |
@@ -142,6 +147,8 @@ Flow_Reports/
 | PATCH  | `/api/data-sources/<id>/` | JWT | Update data source |
 | DELETE | `/api/data-sources/<id>/` | JWT | Delete data source |
 | POST   | `/api/data-sources/test/` | JWT | Test connection (body: db_type, config or data_source_id) |
+| POST   | `/api/data-sources/<id>/run-query/` | JWT | Run SQL or table query (body: sql or table_name; optional refresh: true to bypass cache) |
+| POST   | `/api/data-sources/<id>/refresh-cache/` | JWT | Invalidate query cache for this source (optional body: table_name or sql to clear only that) |
 
 ## Scripts
 

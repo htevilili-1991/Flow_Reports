@@ -84,6 +84,11 @@ export default function DataSourcesPage() {
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
+                  <Link href={`/dashboard/data-sources/${ds.id}/visualizations`}>
+                    <Button variant="secondary" size="sm">
+                      Visualizations
+                    </Button>
+                  </Link>
                   <Link href={`/dashboard/data-sources/${ds.id}/edit`}>
                     <Button variant="outline" size="sm">
                       Edit

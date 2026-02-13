@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,9 +15,16 @@ import {
   Alert,
 } from "@/components/ui";
 
+interface DataSourceItem {
+  id: number;
+  name: string;
+}
+
 export default function NewQuestionPage() {
   const router = useRouter();
   const { hasPermission } = useAuth();
+  const [dataSources, setDataSources] = useState<DataSourceItem[]>([]);
+  const [dataSourceId, setDataSourceId] = useState<number | "">("");
   const [title, setTitle] = useState("");
   const [naturalLanguage, setNaturalLanguage] = useState("");
   const [generatedSql, setGeneratedSql] = useState("");
@@ -26,6 +33,12 @@ export default function NewQuestionPage() {
   const [saving, setSaving] = useState(false);
 
   const canEdit = hasPermission("reports.edit");
+
+  useEffect(() => {
+    authFetch("/api/data-sources/")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setDataSources);
+  }, []);
 
   async function handleGenerateSql() {
     if (!naturalLanguage.trim()) {
@@ -58,6 +71,7 @@ export default function NewQuestionPage() {
       method: "POST",
       body: JSON.stringify({
         title: title.trim(),
+        data_source: dataSourceId === "" ? null : dataSourceId,
         natural_language: naturalLanguage.trim() || " ",
         generated_sql: generatedSql,
       }),
@@ -118,6 +132,26 @@ export default function NewQuestionPage() {
               placeholder="e.g. List all users"
               className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-zinc-700">Data source</label>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Link this question to a data source so you can use it in visualizations for that source.
+            </p>
+            <select
+              value={dataSourceId}
+              onChange={(e) =>
+                setDataSourceId(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="">None</option>
+              {dataSources.map((ds) => (
+                <option key={ds.id} value={ds.id}>
+                  {ds.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-zinc-700">

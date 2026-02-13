@@ -15,6 +15,9 @@ class SavedQuestionListCreateView(APIView):
 
     def get(self, request):
         qs = SavedQuestion.objects.filter(user=request.user)
+        data_source_id = request.query_params.get("data_source_id")
+        if data_source_id:
+            qs = qs.filter(data_source_id=data_source_id)
         serializer = SavedQuestionListSerializer(qs, many=True)
         return Response(serializer.data)
 
