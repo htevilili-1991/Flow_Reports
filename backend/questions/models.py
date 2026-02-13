@@ -10,6 +10,13 @@ class SavedQuestion(models.Model):
         on_delete=models.CASCADE,
         related_name="saved_questions",
     )
+    data_source = models.ForeignKey(
+        "data_sources.DataSource",
+        on_delete=models.CASCADE,
+        related_name="saved_questions",
+        null=True,
+        blank=True,
+    )
     title = models.CharField(max_length=255)
     natural_language = models.TextField(
         help_text="The question in natural language",

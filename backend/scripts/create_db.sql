@@ -3,7 +3,7 @@
 --   sudo -u postgres psql -f scripts/create_db.sql
 -- Or from backend dir: sudo -u postgres psql -f create_db.sql  (if run from backend/scripts)
 
-CREATE USER flow_reports_user WITH PASSWORD 'flow_reports_password';
+CREATE USER flow_reports_user WITH PASSWORD 'your_new_strong_password_here_2026';
 
 CREATE DATABASE flow_reports_db OWNER flow_reports_user;
 

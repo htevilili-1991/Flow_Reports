@@ -13,6 +13,7 @@ export { DataTable } from "./DataTable";
 export type { Column } from "./DataTable";
 export { EmptyState } from "./EmptyState";
 export { LoadingSpinner, LoadingOverlay } from "./LoadingSpinner";
+export { Modal } from "./Modal";
 export { PageHeader } from "./PageHeader";
 export type { BreadcrumbItem } from "./PageHeader";
 export { StatCard } from "./StatCard";

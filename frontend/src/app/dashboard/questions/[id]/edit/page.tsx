@@ -19,8 +19,14 @@ import {
 interface SavedQuestion {
   id: number;
   title: string;
+  data_source: number | null;
   natural_language: string;
   generated_sql: string;
+}
+
+interface DataSourceItem {
+  id: number;
+  name: string;
 }
 
 export default function EditQuestionPage() {
@@ -29,6 +35,8 @@ export default function EditQuestionPage() {
   const id = Number(params.id);
   const { hasPermission } = useAuth();
   const [question, setQuestion] = useState<SavedQuestion | null>(null);
+  const [dataSources, setDataSources] = useState<DataSourceItem[]>([]);
+  const [dataSourceId, setDataSourceId] = useState<number | "">("");
   const [title, setTitle] = useState("");
   const [naturalLanguage, setNaturalLanguage] = useState("");
   const [generatedSql, setGeneratedSql] = useState("");
@@ -40,6 +48,12 @@ export default function EditQuestionPage() {
   const canEdit = hasPermission("reports.edit");
 
   useEffect(() => {
+    authFetch("/api/data-sources/")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setDataSources);
+  }, []);
+
+  useEffect(() => {
     if (!id || isNaN(id)) return;
     authFetch(`/api/questions/${id}/`)
       .then((r) => {
@@ -49,6 +63,7 @@ export default function EditQuestionPage() {
       .then((q) => {
         setQuestion(q);
         setTitle(q.title);
+        setDataSourceId(q.data_source ?? "");
         setNaturalLanguage(q.natural_language);
         setGeneratedSql(q.generated_sql || "");
       })
@@ -91,6 +106,7 @@ export default function EditQuestionPage() {
       method: "PATCH",
       body: JSON.stringify({
         title: title.trim(),
+        data_source: dataSourceId === "" ? null : dataSourceId,
         natural_language: naturalLanguage.trim() || " ",
         generated_sql: generatedSql,
       }),
@@ -173,6 +189,23 @@ export default function EditQuestionPage() {
               onChange={(e) => setTitle(e.target.value)}
               className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-zinc-700">Data source</label>
+            <select
+              value={dataSourceId}
+              onChange={(e) =>
+                setDataSourceId(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="">None</option>
+              {dataSources.map((ds) => (
+                <option key={ds.id} value={ds.id}>
+                  {ds.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-zinc-700">

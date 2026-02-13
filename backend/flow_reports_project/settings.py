@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'users',
     'questions',
     'data_sources',
+    'dashboards',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -148,3 +149,27 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+# -----------------------------------------------------------------------------
+# Cache (Power BI–style: load once → fast in-memory → manual/scheduled refresh)
+# Use Redis if REDIS_URL is set; otherwise locmem (dev without Redis).
+# -----------------------------------------------------------------------------
+CACHE_KEY_PREFIX = "flow_reports"
+QUERY_CACHE_TIMEOUT = int(os.getenv("QUERY_CACHE_TIMEOUT", "300"))  # seconds; 0 = no expiry
+
+REDIS_URL = os.getenv("REDIS_URL", "").strip() or None
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+            "KEY_PREFIX": CACHE_KEY_PREFIX,
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "KEY_PREFIX": CACHE_KEY_PREFIX,
+        }
+    }
