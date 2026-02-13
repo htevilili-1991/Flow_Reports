@@ -1,6 +1,6 @@
 # Flow Reports
 
-**Processing and Reconciliation Management Information System** — analytics dashboards, natural language queries, and role-based access control.
+**Flow Report** — analytics dashboards, natural language queries, and role-based access control.
 
 ## Tech stack
 
