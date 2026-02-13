@@ -5,7 +5,7 @@
 ## Tech stack
 
 - **Backend:** Django 6 + Django REST Framework, PostgreSQL, JWT (Simple JWT), django-cors-headers  
-- **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS  
+- **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, react-grid-layout, Recharts  
 
 ## Prerequisites
 
@@ -86,18 +86,19 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 Flow_Reports/
 ├── backend/
-│   ├── flow_reports_project/   # Django project (settings, urls)
-│   ├── users/                 # Auth, RBAC (Role, UserProfile, JWT, /me, /roles, /users)
-│   ├── questions/             # Saved questions, NL→SQL, run read-only query
-│   ├── data_sources/          # Data source connections (PostgreSQL, MySQL, SQLite), test API
+│   ├── flow_reports_project/   # Django project (settings, urls, cache config)
+│   ├── users/                  # Auth, RBAC (Role, UserProfile, JWT, /me, /roles, /users)
+│   ├── questions/              # Saved questions, NL→SQL, run read-only query
+│   ├── data_sources/           # Connections (PostgreSQL, MySQL, SQLite), schema, run-query, query_cache
+│   ├── dashboards/             # Dashboard model, layout/widgets API, one data source per dashboard
 │   ├── manage.py
 │   └── requirements.txt
 ├── frontend/
 │   └── src/
-│       ├── app/               # Routes: login, register, dashboard, questions, data-sources, users
-│       ├── components/       # AuthGuard, etc.
-│       ├── contexts/         # AuthContext (login, permissions)
-│       ├── lib/              # api.ts (apiUrl, authFetch)
+│       ├── app/                # Routes: login, register, dashboard, dashboards, questions, data-sources, users
+│       ├── components/          # AuthGuard, dashboard (FilterBar, viz modals, VisualizationBuilder)
+│       ├── contexts/            # AuthContext (login, permissions)
+│       ├── lib/                 # api.ts (apiUrl, authFetch)
 │       └── types/
 └── README.md
 ```
@@ -116,6 +117,12 @@ Flow_Reports/
 - **Run query API** — execute SELECT-only SQL, return rows as JSON
 - **Questions UI** — list, create, edit, run; results table and chart placeholder
 - **Data sources** — add PostgreSQL, MySQL, or SQLite connections; test connection before save; list and edit
+
+### Dashboards & visualizations
+- **Dashboards** — create dashboard with a chosen data source; drag-and-drop grid layout (react-grid-layout); save layout and widgets
+- **Saved visualizations** — per data source: table or custom SQL, chart type (line, bar, area, pie, table), column mapping and chart options (title, axis labels, legend)
+- **Viz builder** — drag variables into drop zones (X, Y, series, etc.); create viz from schema table or custom SQL
+- **Widgets** — dashboard widgets load data via run-query (table or SQL); one data source per dashboard, add only visualizations from that source
 
 ### Cache & refresh (Power BI–style)
 - **Query result cache** — run-query results are cached (in-memory by default; Redis if `REDIS_URL` is set). TTL: `QUERY_CACHE_TIMEOUT` (default 300s).
@@ -147,8 +154,20 @@ Flow_Reports/
 | PATCH  | `/api/data-sources/<id>/` | JWT | Update data source |
 | DELETE | `/api/data-sources/<id>/` | JWT | Delete data source |
 | POST   | `/api/data-sources/test/` | JWT | Test connection (body: db_type, config or data_source_id) |
+| GET    | `/api/data-sources/<id>/schema/` | JWT | Tables and columns for this data source |
 | POST   | `/api/data-sources/<id>/run-query/` | JWT | Run SQL or table query (body: sql or table_name; optional refresh: true to bypass cache) |
 | POST   | `/api/data-sources/<id>/refresh-cache/` | JWT | Invalidate query cache for this source (optional body: table_name or sql to clear only that) |
+| GET    | `/api/data-sources/<id>/visualizations/` | JWT | List saved visualizations for this data source |
+| POST   | `/api/data-sources/<id>/visualizations/` | JWT | Create saved visualization |
+| GET    | `/api/data-sources/<ds_pk>/visualizations/<viz_pk>/` | JWT | Get saved visualization |
+| PATCH  | `/api/data-sources/<ds_pk>/visualizations/<viz_pk>/` | JWT | Update saved visualization |
+| DELETE | `/api/data-sources/<ds_pk>/visualizations/<viz_pk>/` | JWT | Delete saved visualization |
+| GET    | `/api/dashboards/` | JWT | List dashboards |
+| POST   | `/api/dashboards/` | JWT | Create dashboard |
+| GET    | `/api/dashboards/<id>/` | JWT | Get dashboard (layout, widgets) |
+| PATCH  | `/api/dashboards/<id>/` | JWT | Update dashboard |
+| DELETE | `/api/dashboards/<id>/` | JWT | Delete dashboard |
+| PATCH  | `/api/dashboards/<id>/layout/` | JWT | Save layout and widgets (body: layout, widgets) |
 
 ## Scripts
 
